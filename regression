@@ -1,0 +1,95 @@
+# createOrder:
+
+import Order from "../../support/workflow/orders/order";
+
+let users;
+let cookiesAccepted = false;
+
+describe("Order Test", () => {
+    before(() => {
+        cy.fixture("updatedUsers").then((data) => {
+            users = data;
+        });
+    });
+
+    beforeEach(() => {
+        cy.clearCookies();
+        cy.clearLocalStorage();
+    });
+
+    it("Create single order", () => {
+        cy.login(
+            "xxxxxxxx@yyyyy.com",
+            "zz",
+            0,
+            cookiesAccepted
+        );
+
+        const a = new Order()
+        a.create()
+    });
+});
+
+# openOrder:
+
+import Order from "../../support/workflow/orders/order";
+
+let users;
+let cookiesAccepted = false;
+
+describe("Order Test", () => {
+    before(() => {
+        cy.fixture("updatedUsers").then((data) => {
+            users = data;
+        });
+    });
+
+    beforeEach(() => {
+        cy.clearCookies();
+        cy.clearLocalStorage();
+    });
+
+    it("Create single order", () => {
+        cy.login(
+            "xxxxxxxx@yyyyy.com",
+            "zz",
+            0,
+            cookiesAccepted
+        );
+
+        const a = new Order()
+        a.open()
+    });
+});
+
+# reOrder:
+
+import Order from "../../support/workflow/orders/order";
+
+let users;
+let cookiesAccepted = false;
+
+describe("Order Test", () => {
+    before(() => {
+        cy.fixture("updatedUsers").then((data) => {
+            users = data;
+        });
+    });
+
+    beforeEach(() => {
+        cy.clearCookies();
+        cy.clearLocalStorage();
+    });
+
+    it("Create single order", () => {
+        cy.login(
+            "xxxxxxxx@yyyyy.com",
+            "zz",
+            0,
+            cookiesAccepted
+        );
+
+        const a = new Order()
+        a.reOrder()
+    });
+});
