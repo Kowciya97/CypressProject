@@ -1,0 +1,23 @@
+# usersActive.js:
+
+{
+"IN": [],                                                                         
+"US": [
+        {
+            "CustomerCode": -------,
+            "LastName": "-----------",
+            "UserAccount": "xxxxxxxx@yyyy.com",
+            "Password": "zzzzzzzz",
+            "active": true,
+            "updated": "2024-07-15T16:25:08.253Z"
+        },
+        {
+            "CustomerCode": -------,
+            "LastName": "--------------",
+            "UserAccount": "xxxxxxxxxx@myopmail.com",
+            "Password": "zzzzzzzzzzzzzz",
+            "active": true,
+            "updated": "2024-07-15T16:25:18.810Z"
+        }
+    ]
+}    
