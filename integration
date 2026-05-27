@@ -1,0 +1,167 @@
+# dashboardd.js:
+
+let users;
+let cookiesAccepted = false;
+let apiCalls = [];
+
+
+describe("Select Customer", () => {
+    before(() => {
+        cy.fixture("updatedUsers").then((data) => {
+            users = data;
+        });
+
+        // Intercept all GET and POST requests to the specified URL pattern
+        cy.intercept('https://qa-api.xxxxxxxx.com/*', (req) => {
+            req.on('response', (res) => {
+                cy.captureApiCall(req, res);
+            });
+        }).as('apiCalls');
+    });
+
+    beforeEach(() => {
+        cy.clearCookies();
+        cy.clearLocalStorage();
+    });
+
+    after(() => {
+        // Save the captured API calls to a JSON file
+        console.log('Writing API calls to JSON file', apiCalls);
+        cy.writeFile('cypress/fixtures/apiCalls.json', apiCalls)
+            .then(() => {
+                console.log('API calls successfully written to apiCalls.json');
+            });
+    });
+
+    it("Select customer", () => {
+        cy.login(
+            "xxxxxxxxxx@yyyy.com",
+            "zz",
+            0,
+            cookiesAccepted
+        );
+
+        cy.wait(5000);
+
+        cy.get('#cwc-sidenav-component > #entitySelector').find('.cwc-entity-selector__id').click();
+      
+        cy.get('#cwc-sidenav-component').find('.cwc-entity-selector-item__name').contains('Miller Homes Ltd - North East').click();
+    });
+});
+
+# verifyActiveUser.js:
+
+let users;
+let cookiesAccepted = false;
+
+describe('Login Test', () => {
+    before(() => {
+        cy.fixture('allUsers').then((data) => {
+            users = data;
+        });
+    });
+
+    beforeEach(() => {
+        cy.clearCookies();
+        cy.clearLocalStorage();
+    });
+
+    it('logs in and checks the welcome message for a specific country', () => {
+        const countryCode = 'zz'; // Change this to the country code you want to test
+        const countryUsers = users[countryCode] || [];
+
+        countryUsers.forEach((user, index) => {
+            if (!user.Password) {
+                // Skip users with null passwords
+                return;
+            }
+            cy.intercept('POST', 'https://qa-api.xxxxxxxx.com/v6/secm/oam/oauth2/token').as('token')
+            // Visit the login page
+            cy.visit(Cypress.env('url'));
+
+            // Accept cookies only once
+            if (!cookiesAccepted) {
+                cy.get('#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll').click({ force: true });
+                cookiesAccepted = true;
+            }
+
+            // Perform login steps
+            cy.get('#cwc-input-0').type(user.UserAccount);
+            cy.get('#cwc-input-1').type(user.Password);
+            cy.get('#cmx-login-form-submit-btn').click();
+
+            cy.wait('@token')
+
+            cy.wait(6000)
+            // Check if the error message is displayed
+            cy.get('h1').then(e => {
+                const headerText = e[0].text();
+                // Welcome to XXXXXX
+                if (headerText.includes('Welcome to XXXXXX')) {
+                    cy.log('LOGGED IN');
+                    const updatedUser = { ...user, active: true, updated: new Date().toISOString() };
+                    cy.task('updateUserJson', { countryCode, index, updatedUser });
+                } else {
+                    cy.log('NOT LOGGED IN');
+                    const updatedUser = { ...user, active: false, updated: new Date().toISOString(), note: "user or password incorrect" };
+                    cy.task('updateUserJson', { countryCode, index, updatedUser });
+                }
+            });
+        });
+    });
+});
+
+# selectCustomer.js:
+
+mport ClientApi from "../../support/util/api/client";
+
+let users;
+let cookiesAccepted = false;
+
+describe("Select Customer", () => {
+  before(() => {
+    cy.fixture("updatedUsers").then((data) => {
+      users = data;
+    });
+    cy.intercept("GET", "https://qa-api.xxxxxxxx.com/v1/odm/orders?*").as(
+      "orders"
+    );
+  });
+
+  beforeEach(() => {
+    cy.clearCookies();
+    cy.clearLocalStorage();
+  });
+
+  it("Select customer", () => {
+    cy.login(
+      "xxxxxxxxd@yyyy.com",
+      "zz",
+      0,
+      cookiesAccepted
+    );
+
+    cy.wait("@orders");
+    cy.wait(5000);
+
+    cy.get("#cwc-sidenav-component > #entitySelector")
+      .find(".cwc-entity-selector__id")
+      .click();
+
+    cy.get("#cwc-sidenav-component")
+      .find(".cwc-entity-selector-item__name")
+      .contains("Miller Homes Ltd - North East")
+      .click();
+
+    cy.then(() => {
+      const api = new ClientApi();   
+    
+      api.myLegalEnt({
+        fetch: "0",
+        page: "0",
+      }).then((response) => {
+        console.log("response mycontacts", response);
+      });
+    });
+  });
+});
